@@ -4,8 +4,13 @@
   // Global vars
   var win = window,
       doc = document,
-      body = doc.querySelector('body'),
-      isTouch = 'ontouchstart' in win;
+      isTouch = 'ontouchstart' in win,
+      scrn = {
+        getWidth: function() {
+          return isTouch ? screen.width : win.innerWidth;
+        }
+      },
+      body = doc.querySelector('body');
 
   /**
    * Creates a JustNavbar.
@@ -34,25 +39,33 @@
     navClass: 'navbar-nav',
     stickUp: true,
     responsive: {
-      0: {
+      xs: {
+        alias: 'xs',
+        size: 0,
         layout: 'navbar-device',
         deviceLayout: 'navbar-device',
         focusOnHover: false,
         stickUp: false
       },
-      768: {
+      sm: {
+        alias: 'lg',
+        size: 768,
         layout: 'navbar-765',
         deviceLayout: 'navbar-768',
         focusOnHover: true,
         stickUp: false
       },
-      992: {
+      md: {
+        alias: 'md',
+        size: 992,
         layout: 'navbar-9992',
         deviceLayout: 'navbar-9992',
         focusOnHover: true,
         stickUp: false
       },
-      1200: {
+      lg: {
+        alias: 'lg',
+        size: 1200,
         layout: 'navbar-DESK',
         deviceLayout: 'navbar-device',
         focusOnHover: true,
@@ -66,10 +79,11 @@
    * @protected
    **/
   JustNavbar.prototype._init = function (ctx) {
+    var currentRespWidth = ctx._getRespSize(ctx, scrn.getWidth());
     ctx._initNav(ctx);
     ctx._applyHandlers(ctx);
     // Set active layout
-    ctx._resize();
+    // get current layout and pass it to switchNav layout    ctx._switchNavLayout(ctx, ctx._getLayout(ctx, currentRespWidth['alias']));
   }
 
   /**
@@ -126,6 +140,7 @@
         currentEl = target;
       }
     };
+
     // Remove class focus
     navWithSubmenu.onmouseout = function (e) {
       var relatedTarget;
@@ -145,10 +160,15 @@
       currentEl.classList.remove('focus');
       currentEl = null;
     };
-    // On resize event
-    win.onresize = function (e) {
-      ctx._resize(ctx, win.innerWidth);
-    };
+
+    // Add orientationchange and on resize events
+    window.addEventListener("orientationchange", function() {
+      ctx._resize(ctx, scrn.getWidth());
+    });
+
+    window.addEventListener("resize", function() {
+      ctx._resize(ctx, scrn.getWidth());
+    });
   }
 
   /**
@@ -158,22 +178,44 @@
    **/
   JustNavbar.prototype._resize = function (ctx, currentWidth) {
     switch (true) {
-      case (currentWidth < 768 && ctx.currentLayout != ctx._getLayout(ctx, 0) ):
+      case (currentWidth < 768 && ctx.currentLayout != ctx._getLayout(ctx, 'xs') ):
         console.log('xs');
-        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 0));
+        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 'xs'));
         break;
-      case (currentWidth > 767 && currentWidth < 992 && ctx.currentLayout != ctx._getLayout(ctx, 768)):
+      case (currentWidth > 767 && currentWidth < 992 && ctx.currentLayout != ctx._getLayout(ctx, 'sm')):
         console.log('sm');
-        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 768));
+        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 'sm'));
         break;
-      case (currentWidth > 991 && currentWidth < 1200 && ctx.currentLayout != ctx._getLayout(ctx, 992)):
+      case (currentWidth > 991 && currentWidth < 1200 && ctx.currentLayout != ctx._getLayout(ctx, 'md')):
         console.log('md');
-        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 992));
+        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 'md'));
         break;
-      case (currentWidth > 1199 && currentWidth < 1800 && ctx.currentLayout != ctx._getLayout(ctx, 1200)):
+      case (currentWidth > 1199 && ctx.currentLayout != ctx._getLayout(ctx, 'lg')):
         console.log('lg');
-        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 1200));
+        ctx._switchNavLayout(ctx, ctx._getLayout(ctx, 'lg'));
         break;
+    }
+  }
+
+  /**
+   * Get current responsive size
+   * @desc Switch current window width and return current resp size
+   * @protected
+   **/
+  JustNavbar.prototype._getRespSize = function (ctx, currentWidth) {
+    switch (true) {
+      case (currentWidth < 768):
+        console.log('xs');
+        return ctx.options.responsive['xs'];
+      case (currentWidth > 767 && currentWidth < 992):
+        console.log('sm');
+        return ctx.options.responsive['sm'];
+      case (currentWidth > 991 && currentWidth < 1200):
+        console.log('md');
+        return ctx.options.responsive['md'];
+      case (currentWidth > 1199):
+        console.log('lg');
+        return ctx.options.responsive['lg'];
     }
   }
 
@@ -198,11 +240,11 @@
    * @desc Get needed layout
    * @protected
    **/
-  JustNavbar.prototype._getLayout = function (ctx, size) {
+  JustNavbar.prototype._getLayout = function (ctx, alias) {
     if (isTouch) {
-      return ctx.options.responsive[size].deviceLayout;
+      return ctx.options.responsive[alias].deviceLayout;
     }
-    return ctx.options.responsive[size].layout;
+    return ctx.options.responsive[alias].layout;
   }
 
 
@@ -231,8 +273,10 @@
   return window.JustNavbar = JustNavbar;
 })();
 
-
-new JustNavbar('.navbar',
+console.log(new JustNavbar(
+    '.navbar', // Selector for navabr
+    // Object with options
     {
       layout: 'navbar-DESK'
-    });
+    }
+));
