@@ -6,8 +6,8 @@
       doc = document,
       isTouch = 'ontouchstart' in win,
       scrn = {
-        getWidth: function() {
-          return isTouch ? screen.width : win.innerWidth;
+        getWidth: function () {
+          return Math.min(win.innerWidth || Infinity, screen.width);
         }
       },
       body = doc.querySelector('body');
@@ -34,8 +34,6 @@
    * @protected
    **/
   JustNavbar.prototype._Defaults = {
-    layout: 'navbar-DESK',
-    deviceLayout: 'navbar-device',
     navClass: 'navbar-nav',
     stickUp: true,
     responsive: {
@@ -43,15 +41,15 @@
         alias: 'xs',
         size: 0,
         layout: 'navbar-device',
-        deviceLayout: 'navbar-device',
+        deviceLayout: 'navbar-device-DEVICE',
         focusOnHover: false,
         stickUp: false
       },
       sm: {
-        alias: 'lg',
+        alias: 'sm',
         size: 768,
-        layout: 'navbar-765',
-        deviceLayout: 'navbar-768',
+        layout: 'navbar-768',
+        deviceLayout: 'navbar-768-DEVICE',
         focusOnHover: true,
         stickUp: false
       },
@@ -59,7 +57,7 @@
         alias: 'md',
         size: 992,
         layout: 'navbar-9992',
-        deviceLayout: 'navbar-9992',
+        deviceLayout: 'navbar-9992-DEVICE',
         focusOnHover: true,
         stickUp: false
       },
@@ -67,7 +65,7 @@
         alias: 'lg',
         size: 1200,
         layout: 'navbar-DESK',
-        deviceLayout: 'navbar-device',
+        deviceLayout: 'navbar-DESK-DEVICE',
         focusOnHover: true,
         stickUp: true
       }
@@ -83,7 +81,8 @@
     ctx._initNav(ctx);
     ctx._applyHandlers(ctx);
     // Set active layout
-    // get current layout and pass it to switchNav layout    ctx._switchNavLayout(ctx, ctx._getLayout(ctx, currentRespWidth['alias']));
+    // get current layout and pass it to switchNav layout
+    ctx._switchNavLayout(ctx, ctx._getLayout(ctx, currentRespWidth['alias']));
   }
 
   /**
@@ -148,6 +147,7 @@
       if (!currentEl) return;
 
       relatedTarget = event.relatedTarget;
+      console.log('relatedTarget ' + relatedTarget);
 
       if (relatedTarget) {
         while (relatedTarget) {
@@ -162,11 +162,11 @@
     };
 
     // Add orientationchange and on resize events
-    window.addEventListener("orientationchange", function() {
+    window.addEventListener("orientationchange", function () {
       ctx._resize(ctx, scrn.getWidth());
     });
 
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", function () {
       ctx._resize(ctx, scrn.getWidth());
     });
   }
@@ -225,6 +225,7 @@
    * @protected
    **/
   JustNavbar.prototype._switchNavLayout = function (ctx, targetLayout) {
+    console.log('_switchNavLayout');
     ctx.element.classList.add('navbar-no-transition');
     ctx.element.classList.remove(ctx.currentLayout);
     ctx.element.classList.add(targetLayout);
@@ -245,6 +246,25 @@
       return ctx.options.responsive[alias].deviceLayout;
     }
     return ctx.options.responsive[alias].layout;
+  }
+
+  /**
+   * Data api
+   * @desc Set data api
+   * @protected
+   **/
+  JustNavbar.prototype._setDataApi = function (ctx) {
+    // Layout
+    // Device Layout
+    // Focus on hover
+    // Stickup
+    // stick-up-offset
+    var i;
+
+    for(i = 0; i< ctx.options.responsive.length; i++) {
+
+    }
+
   }
 
 
@@ -277,6 +297,6 @@ console.log(new JustNavbar(
     '.navbar', // Selector for navabr
     // Object with options
     {
-      layout: 'navbar-DESK'
+
     }
 ));
