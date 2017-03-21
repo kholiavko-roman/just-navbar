@@ -22,7 +22,9 @@
   var JustNavbar = function (el, options) {
     var ctx = this;
 
+    // Merge def opt and opt in parameters
     ctx.options = extend(ctx._Defaults, options);
+
     ctx.element = document.querySelector(el);
     ctx.currentLayout = ctx.options.layout;
 
@@ -77,12 +79,77 @@
    * @protected
    **/
   JustNavbar.prototype._init = function (ctx) {
-    var currentRespWidth = ctx._getRespSize(ctx, scrn.getWidth());
+    var currentRespWidth = ctx._getRespSize(ctx);
+    // Set data api for navbar, and set options if exist data attr
+    ctx._setDataApi(ctx);
+    // Init navigation
     ctx._initNav(ctx);
+    // Apply handlers
     ctx._applyHandlers(ctx);
     // Set active layout
     // get current layout and pass it to switchNav layout
     ctx._switchNavLayout(ctx, ctx._getLayout(ctx, currentRespWidth['alias']));
+  }
+
+  /**
+   * Get options by name
+   * @desc return options value by name
+   * @protected
+   **/
+  JustNavbar.prototype._getOption = function (ctx, optName) {
+    return ctx._getRespSize(ctx)[optName];
+  }
+
+  /**
+   * Get layout
+   * @desc Get needed layout
+   * @protected
+   **/
+  JustNavbar.prototype._getLayout = function (ctx, alias) {
+    return ctx.options.responsive[alias][isTouch ? 'deviceLayout' : 'layout'];
+  }
+
+  /**
+   * Data api
+   * @desc Set data api
+   * @protected
+   **/
+  JustNavbar.prototype._setDataApi = function (ctx) {
+    var apiOptName = [
+          {
+            attrName: 'layout',
+            objName: 'layout'
+          },
+          {
+            attrName: 'device-layout',
+            objName: 'deviceLayout'
+          },
+          {
+            attrName: 'focus-on-hover',
+            objName: 'focusOnHover'
+          },
+          {
+            attrName: 'stick-up',
+            objName: 'stickUp'
+          },
+          {
+            attrName: 'stick-up-offset',
+            objName: 'stickUpOffset'
+          }
+        ],
+        currAlias,
+        i;
+
+    for (currAlias in ctx.options.responsive) {
+      for (i = 0; i < apiOptName.length; i++) {
+        var currentRespObj = ctx.options.responsive[currAlias],
+            tmpAttr = ctx.element.getAttribute('data-' + currentRespObj.alias + '-' + apiOptName[i].attrName);
+
+        if (tmpAttr) {
+          currentRespObj[apiOptName[i].objName] = tmpAttr === "true" ? true : tmpAttr === "false" ? false : tmpAttr;
+        }
+      }
+    }
   }
 
   /**
@@ -118,23 +185,22 @@
         currentEl = null;
 
     doc.addEventListener('click', function (e) {
+      var target = e.target;
       // Toogle for opening sub-menu
       // Bind this event via document, because target element was created dynamically
-      if (e.target && e.target.classList.contains('just-navbar-submenu-toggle')) {
-        console.log('aa');
+      if (target && target.classList.contains('just-navbar-submenu-toggle')) {
+        console.log('Open submenu');
+        target.parentNode.classList.toggle('focus');
       }
     });
 
     // Add class for open sub-menu
     navWithSubmenu.onmouseover = function (e) {
-      var target;
-
-      if (currentEl) return;
-
-      target = e.target;
+      var target = e.target;
 
       // Add focus class to open submenu
-      if (target && target.classList.contains('navbar-has-submenu')) {
+      if (ctx._getOption(ctx, 'focusOnHover') && target
+          && target.classList.contains('navbar-has-submenu') && !currentEl) {
         target.classList.add('focus');
         currentEl = target;
       }
@@ -147,7 +213,6 @@
       if (!currentEl) return;
 
       relatedTarget = event.relatedTarget;
-      console.log('relatedTarget ' + relatedTarget);
 
       if (relatedTarget) {
         while (relatedTarget) {
@@ -168,6 +233,11 @@
 
     window.addEventListener("resize", function () {
       ctx._resize(ctx, scrn.getWidth());
+    });
+
+    // Add onscroll event to set sticky navbar
+    window.addEventListener("scroll", function () {
+      ctx._stickUp(ctx);
     });
   }
 
@@ -202,7 +272,9 @@
    * @desc Switch current window width and return current resp size
    * @protected
    **/
-  JustNavbar.prototype._getRespSize = function (ctx, currentWidth) {
+  JustNavbar.prototype._getRespSize = function (ctx) {
+    var currentWidth = scrn.getWidth();
+
     switch (true) {
       case (currentWidth < 768):
         console.log('xs');
@@ -218,6 +290,7 @@
         return ctx.options.responsive['lg'];
     }
   }
+
 
   /**
    * SwitchNavLayout
@@ -235,36 +308,13 @@
     ctx.currentLayout = targetLayout;
   }
 
-
   /**
-   * Get layout
-   * @desc Get needed layout
+   * Stick up navbar
+   * @desc set up stickup navbar on scroll
    * @protected
    **/
-  JustNavbar.prototype._getLayout = function (ctx, alias) {
-    if (isTouch) {
-      return ctx.options.responsive[alias].deviceLayout;
-    }
-    return ctx.options.responsive[alias].layout;
-  }
-
-  /**
-   * Data api
-   * @desc Set data api
-   * @protected
-   **/
-  JustNavbar.prototype._setDataApi = function (ctx) {
-    // Layout
-    // Device Layout
-    // Focus on hover
-    // Stickup
-    // stick-up-offset
-    var i;
-
-    for(i = 0; i< ctx.options.responsive.length; i++) {
-
-    }
-
+  JustNavbar.prototype._stickUp = function (ctx) {
+    console.log(win.pageYOffset || doc.documentElement.scrollTop);
   }
 
 
@@ -296,7 +346,5 @@
 console.log(new JustNavbar(
     '.navbar', // Selector for navabr
     // Object with options
-    {
-
-    }
+    {}
 ));
