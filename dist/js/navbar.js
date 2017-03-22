@@ -8,6 +8,20 @@
       scrn = {
         getWidth: function () {
           return Math.min(win.innerWidth || Infinity, screen.width);
+        },
+        getHeight: function () {
+          return Math.min(win.innerHeight || Infinity, screen.height);
+        }
+      },
+      operateWithClass = function (arrElem, action, currentClass) {
+        var i;
+
+        for (i = 0; i < arrElem.length; i++) {
+          if (action === 'add') {
+            arrElem[i].classList.add(currentClass);
+          } else {
+            arrElem[i].classList.remove(currentClass);
+          }
         }
       },
       body = doc.querySelector('body');
@@ -27,6 +41,8 @@
 
     ctx.element = document.querySelector(el);
     ctx.currentLayout = ctx.options.layout;
+    ctx.isStuck = false;
+    console.log('isStuck ' + ctx.isStuck);
 
     ctx._init(ctx);
   }
@@ -310,11 +326,47 @@
 
   /**
    * Stick up navbar
-   * @desc set up stickup navbar on scroll
+   * @desc set up stickup navbar on scroll, using scroll-offset top if exist
    * @protected
    **/
   JustNavbar.prototype._stickUp = function (ctx) {
-    console.log(win.pageYOffset || doc.documentElement.scrollTop);
+    var currOffsetTop = win.pageYOffset || doc.documentElement.scrollTop,
+        currStickUpOffset = ctx._getOption(ctx, 'stickUpOffset') || 0,
+        currStickUpOffsetUnit = 'px';
+
+    if(currStickUpOffset && currStickUpOffset.indexOf('%') != -1) {
+      currStickUpOffsetUnit = '%';
+    }
+
+    if (!ctx.isStuck && getScrollOffsetVal() >= parseFloat(currStickUpOffset)) {
+      ctx.element.classList.add('just-navbar--sticky');
+      ctx.isStuck = true;
+      // Close opened submenu and toggle
+      operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
+      console.log('add sticky');
+    } else if (ctx.isStuck && getScrollOffsetVal() < parseFloat(currStickUpOffset)) {
+      ctx.element.classList.remove('just-navbar--sticky');
+      ctx.isStuck = false;
+      console.log('remove sticky');
+    }
+
+
+    /**
+     * getScrollOffsetVal
+     * @desc return scroll offset in percentage if stick-up set up in percentage
+     * @protected
+     **/
+    function getScrollOffsetVal() {
+      var currWidth;
+
+      if (currStickUpOffsetUnit === '%') {
+        currWidth = scrn.getHeight();
+        console.log(currOffsetTop / currWidth * 100);
+        return currOffsetTop / currWidth * 100;
+      }
+
+      return currOffsetTop;
+    }
   }
 
 
