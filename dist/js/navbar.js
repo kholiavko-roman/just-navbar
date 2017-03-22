@@ -35,6 +35,7 @@
    * */
   var JustNavbar = function (el, options) {
     var ctx = this;
+    ctx.toggleGroup = [];
 
     // Merge def opt and opt in parameters
     ctx.options = extend(ctx._Defaults, options);
@@ -253,8 +254,12 @@
 
     // Add onscroll event to set sticky navbar
     window.addEventListener("scroll", function () {
-      ctx._stickUp(ctx);
+      if(ctx._getOption(ctx, 'stickUp')) {
+        ctx._stickUp(ctx);
+      }
     });
+
+    ctx._enableToggles(ctx);
   }
 
   /**
@@ -315,6 +320,10 @@
    **/
   JustNavbar.prototype._switchNavLayout = function (ctx, targetLayout) {
     console.log('_switchNavLayout');
+    // Close opened submenu and toggle
+    operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
+    ctx._closeToggles(ctx);
+    
     ctx.element.classList.add('navbar-no-transition');
     ctx.element.classList.remove(ctx.currentLayout);
     ctx.element.classList.add(targetLayout);
@@ -331,7 +340,7 @@
    **/
   JustNavbar.prototype._stickUp = function (ctx) {
     var currOffsetTop = win.pageYOffset || doc.documentElement.scrollTop,
-        currStickUpOffset = ctx._getOption(ctx, 'stickUpOffset') || 0,
+        currStickUpOffset = ctx._getOption(ctx, 'stickUpOffset') || '1px',
         currStickUpOffsetUnit = 'px';
 
     if(currStickUpOffset && currStickUpOffset.indexOf('%') != -1) {
@@ -343,6 +352,8 @@
       ctx.isStuck = true;
       // Close opened submenu and toggle
       operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
+      ctx._closeToggles(ctx);
+      console.log(getScrollOffsetVal());
       console.log('add sticky');
     } else if (ctx.isStuck && getScrollOffsetVal() < parseFloat(currStickUpOffset)) {
       ctx.element.classList.remove('just-navbar--sticky');
@@ -366,6 +377,49 @@
       }
 
       return currOffsetTop;
+    }
+  }
+
+  /**
+   * EnableToggles
+   * @desc set up stickup navbar on scroll, using scroll-offset top if exist
+   * @protected
+   **/
+  JustNavbar.prototype._enableToggles = function (ctx) {
+    var togles = ctx.element.querySelectorAll('[data-target]'),
+        i;
+
+    // Write all target selectors to ctx.toggleGroup
+    // and bind click event on each
+    for(i = 0; i < togles.length; i++) {
+      var element = togles[i],
+          targetSelector = element.getAttribute('data-target'),
+          target = doc.querySelector(targetSelector);
+
+      ctx.toggleGroup.push(target);
+
+      element.addEventListener('click', (function(el) {
+        return function () {
+          if(!el.classList.contains('active')) {
+            ctx._closeToggles(ctx);
+          }
+
+          el.classList.toggle('active');
+        }
+      })(target));
+    }
+  }
+
+  /**
+   * CloseToggles
+   * @desc set up stickup navbar on scroll, using scroll-offset top if exist
+   * @protected
+   **/
+  JustNavbar.prototype._closeToggles = function (ctx) {
+    var i;
+
+    for(i = 0; i< ctx.toggleGroup.length; i++) {
+      ctx.toggleGroup[i].classList.remove('active');
     }
   }
 
