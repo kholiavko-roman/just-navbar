@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  //https://slideout.js.org/ 
+
   // Global vars
   var win = window,
       doc = document,
@@ -13,15 +15,39 @@
           return Math.min(win.innerHeight || Infinity, screen.height);
         }
       },
-      operateWithClass = function (arrElem, action, currentClass) {
+      operateWithClass = function (el, action, currentClass) {
         var i;
 
-        for (i = 0; i < arrElem.length; i++) {
-          if (action === 'add') {
-            arrElem[i].classList.add(currentClass);
-          } else {
-            arrElem[i].classList.remove(currentClass);
+        for (i = 0; i < el.length; i++) {
+          var item = el[i],
+              j;
+
+          // if node list contains more then one elements
+          if (item.length > 1) {
+            for (j = 0; j < item.length; j++) {
+              changeClass(item[j]);
+            }
+          } else { // if single item
+            changeClass(item);
           }
+
+        }
+
+        function changeClass(item) {
+          if (action === 'toggle') {
+            item.classList.toggle(currentClass);
+          } else if (action === 'add') {
+            item.classList.add(currentClass);
+          } else {
+            item.classList.remove(currentClass);
+          }
+        }
+      },
+      hasClass = function (el) {
+        // if node list contains more then one elements
+        if (el.length > 1) {
+
+        } else { // if single item
         }
       },
       body = doc.querySelector('body');
@@ -36,6 +62,7 @@
   var JustNavbar = function (el, options) {
     var ctx = this;
     ctx.toggleGroup = [];
+    ctx.currentToggle = null;
 
     // Merge def opt and opt in parameters
     ctx.options = extend(ctx._Defaults, options);
@@ -43,6 +70,9 @@
     ctx.element = document.querySelector(el);
     ctx.currentLayout = ctx.options.layout;
     ctx.isStuck = false;
+    ctx.mobileNavWrap = ctx.element.querySelector('.navbar-mobile-menu-wrap');
+    ctx.mobileNavWrapWidth = ctx.mobileNavWrap.offsetWidth;
+    ctx.isMenuOpen = false;
     console.log('isStuck ' + ctx.isStuck);
 
     ctx._init(ctx);
@@ -55,12 +85,13 @@
   JustNavbar.prototype._Defaults = {
     navClass: 'navbar-nav',
     stickUp: true,
+    startSwipeWidth: 10,
     responsive: {
       xs: {
         alias: 'xs',
         size: 0,
         layout: 'navbar-device',
-        deviceLayout: 'navbar-device-DEVICE',
+        deviceLayout: 'navbar-device',
         focusOnHover: false,
         stickUp: false
       },
@@ -201,15 +232,36 @@
     var navWithSubmenu = doc.querySelector('.navbar-has-submenu'),
         currentEl = null;
 
-    doc.addEventListener('click', function (e) {
+    doc.addEventListener(isTouch ? 'touchstart' : 'mousedown', function (e) {
       var target = e.target;
-      // Toogle for opening sub-menu
+
+      // Toggles for opening sub-menu
       // Bind this event via document, because target element was created dynamically
       if (target && target.classList.contains('just-navbar-submenu-toggle')) {
         console.log('Open submenu');
         target.parentNode.classList.toggle('focus');
       }
+
+      // If toggle is opened now
+      // Close it by clicking on the document, but not inside toggles target.
+      if (ctx.currentToggle) {
+        var currTarget = target;
+
+        // Check all nodes form clicked element
+        while (currTarget != null && currTarget.tagName.toLocaleLowerCase() != 'html') {
+          // If contains active class, we inside open block
+          if (currTarget.classList.contains('active')) {
+            return;
+          }
+          // go to the top
+          currTarget = currTarget.parentNode;
+        }
+
+        ctx._closeToggles(ctx);
+        ctx.currentToggle = null;
+      }
     });
+
 
     // Add class for open sub-menu
     navWithSubmenu.onmouseover = function (e) {
@@ -254,12 +306,16 @@
 
     // Add onscroll event to set sticky navbar
     window.addEventListener("scroll", function () {
-      if(ctx._getOption(ctx, 'stickUp')) {
+      if (ctx._getOption(ctx, 'stickUp')) {
         ctx._stickUp(ctx);
       }
     });
 
     ctx._enableToggles(ctx);
+
+    if (isTouch) {
+      ctx._enableSwipeMenu(ctx);
+    }
   }
 
   /**
@@ -322,8 +378,10 @@
     console.log('_switchNavLayout');
     // Close opened submenu and toggle
     operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
-    ctx._closeToggles(ctx);
-    
+    if (ctx.currentToggle) {
+      ctx._closeToggles(ctx);
+    }
+
     ctx.element.classList.add('navbar-no-transition');
     ctx.element.classList.remove(ctx.currentLayout);
     ctx.element.classList.add(targetLayout);
@@ -343,7 +401,7 @@
         currStickUpOffset = ctx._getOption(ctx, 'stickUpOffset') || '1px',
         currStickUpOffsetUnit = 'px';
 
-    if(currStickUpOffset && currStickUpOffset.indexOf('%') != -1) {
+    if (currStickUpOffset && currStickUpOffset.indexOf('%') != -1) {
       currStickUpOffsetUnit = '%';
     }
 
@@ -391,20 +449,27 @@
 
     // Write all target selectors to ctx.toggleGroup
     // and bind click event on each
-    for(i = 0; i < togles.length; i++) {
+    for (i = 0; i < togles.length; i++) {
       var element = togles[i],
           targetSelector = element.getAttribute('data-target'),
-          target = doc.querySelector(targetSelector);
+          target = doc.querySelectorAll(targetSelector);
 
       ctx.toggleGroup.push(target);
 
-      element.addEventListener('click', (function(el) {
+      element.addEventListener('click', (function (el) {
         return function () {
-          if(!el.classList.contains('active')) {
+          if (ctx.currentToggle && !this.classList.contains('active')) {
             ctx._closeToggles(ctx);
           }
+          ctx.currentToggle = {
+            toggle: this,
+            togglesEl: el
+          };
 
-          el.classList.toggle('active');
+
+          this.classList.toggle('active');
+          operateWithClass(el, 'toggle', 'active');
+          // el.classList.toggle('active');
         }
       })(target));
     }
@@ -418,8 +483,114 @@
   JustNavbar.prototype._closeToggles = function (ctx) {
     var i;
 
-    for(i = 0; i< ctx.toggleGroup.length; i++) {
-      ctx.toggleGroup[i].classList.remove('active');
+    // Close all toggle elements (targets)
+    for (i = 0; i < ctx.toggleGroup.length; i++) {
+      var item = ctx.toggleGroup[i],
+          j;
+
+      for (j = 0; j < item.length; j++) {
+        item[j].classList.remove('active');
+      }
+    }
+
+    // Close active toggle button
+    ctx.currentToggle.toggle.classList.remove('active');
+  }
+
+
+  /**
+   * CloseToggles
+   * @desc set up stickup navbar on scroll, using scroll-offset top if exist
+   * @protected
+   **/
+  JustNavbar.prototype._enableSwipeMenu = function (ctx) {
+    var currentPos,
+        startPos,
+        oneWay = false,
+        isMove = false;
+
+    doc.addEventListener('touchstart', function (e) {
+      if (!ctx.mobileNavWrapWidth) {
+        ctx.mobileNavWrapWidth = ctx.mobileNavWrap.offsetWidth;
+      }
+
+      startPos = e.touches[0].clientX;
+      console.log('startPos ' + startPos);
+      console.log('ctx.options.startSwipeWidth ' + ctx.options.startSwipeWidth);
+      console.log('startPos ' + startPos <= ctx.options.startSwipeWidth);
+
+
+      //if (startPos <= ctx.options.startSwipeWidth || ctx.isMenuOpen) {
+        isMove = true;
+        body.classList.add('menu-open');
+        doc.addEventListener('touchmove', touchmoveListener);
+      //}
+
+    });
+
+    doc.addEventListener('touchend', function (e) {
+      oneWay = false;
+      doc.removeEventListener('touchmove', touchmoveListener);
+      if (isMove) {
+        isMove = false;
+
+        ctx.mobileNavWrap.addEventListener("transitionend", transitionEndListener, false);
+
+        ctx.mobileNavWrap.style.transition = '100ms cubic-bezier(.23,.59,.86,.57)';
+
+        if (currentPos > ctx.mobileNavWrapWidth / 2) {
+          ctx.mobileNavWrap.style.transform = 'translateX(-' + 0 + 'px) translateZ(0)';
+          ctx.isMenuOpen = true;
+          body.classList.add('menu-open');
+        } else {
+          ctx.mobileNavWrap.style.transform = 'translateX(-' + ctx.mobileNavWrapWidth + 'px) translateZ(0)';
+          ctx.isMenuOpen = false;
+          body.classList.remove('menu-open');
+        }
+      }
+    });
+
+
+    function transitionEndListener(e) {
+      ctx.mobileNavWrap.removeEventListener("transitionend", transitionEndListener, false);
+      ctx.mobileNavWrap.style.transition = '';
+    }
+
+
+    function touchmoveListener(e) {
+      var offset;
+
+      console.log('=================');
+      console.log('ctx.mobileNavWrapWidth ' + ctx.mobileNavWrapWidth);
+      console.log('startPos ' + startPos);
+
+      currentPos = e.touches[0].clientX;
+
+      console.log('currentPos ' + currentPos);
+
+      if (startPos < currentPos || oneWay) {
+        oneWay = true;
+        offset = ctx.mobileNavWrapWidth - (currentPos - startPos);
+      } else {
+        offset = startPos - currentPos;
+      }
+
+      console.log('offset ' + offset);
+
+      // if menu closed
+      offset = offset > ctx.mobileNavWrapWidth ? ctx.mobileNavWrapWidth : offset;
+      console.log('  ==offset ' + offset);
+
+      // open menu
+      offset = offset < 0 ? 0 : offset;
+      console.log('   ==offset ' + offset);
+
+      console.log(e.touches[0].clientX);
+
+
+      ctx.mobileNavWrap.style.transform = 'translateX(-' + offset + 'px) translateZ(0)';
+
+
     }
   }
 

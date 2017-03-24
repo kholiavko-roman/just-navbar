@@ -1,25 +1,23 @@
-.just-navbar-submenu-toggle {
-  width: 15px;
-  height: 15px;
-  display: inline-block;
-  background: lightseagreen;
+@import "mixins/mixins";
+@import "normalise";
+
+* {
+  margin: 0;
+  padding: 0;
 }
 
-.just-navbar--sticky {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+a,
+button{
+  &:active,
+  &:focus {
+    outline: none;
+  }
 }
 
-li {
+li{
   list-style: none;
 }
 
-.navbar-panel {
-  display: none;
-
-  &.active {
-    display: block;
-  }
+a {
+  text-decoration: none;
 }

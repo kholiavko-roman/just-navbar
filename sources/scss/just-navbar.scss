@@ -1,0 +1,60 @@
+@import "mixins/mixins";
+
+.navbar {
+  display: none;
+}
+
+.navbar-device {
+  display: block;
+}
+
+.navbar-nav-dropdown{
+  display: none;
+
+  .focus > &{
+    display: block;
+  }
+}
+
+.just-navbar-submenu-toggle {
+  display: inline-block;
+}
+
+.navbar-toggle {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// Sticky styles
+.just-navbar--sticky {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+// search
+.navbar-search {
+  display: none;
+  background: bisque;
+  position: relative;
+  top: -10px;
+  z-index: 99999999;
+  padding: 15px;
+
+  &.active {
+    display: block;
+  }
+}
+
+
+// Include styles of specific navbars
+@import "just-navbar/just-navbar-device";

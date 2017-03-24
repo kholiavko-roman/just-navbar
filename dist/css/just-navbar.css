@@ -1,0 +1,129 @@
+.navbar {
+  display: none;
+}
+
+.navbar-device {
+  display: block;
+}
+
+.navbar-nav-dropdown {
+  display: none;
+}
+
+.focus > .navbar-nav-dropdown {
+  display: block;
+}
+
+.just-navbar-submenu-toggle {
+  display: inline-block;
+}
+
+.navbar-toggle {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar-toggle .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.just-navbar--sticky {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+.navbar-search {
+  display: none;
+  background: bisque;
+  position: relative;
+  top: -10px;
+  z-index: 99999999;
+  padding: 15px;
+}
+
+.navbar-search.active {
+  display: block;
+}
+
+.navbar-device .navbar-panel {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  height: 40px;
+  background: blueviolet;
+}
+
+.navbar-device .navbar-mobile-menu-wrap {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 125%;
+  width: 255px;
+  transform: translateX(-255px);
+  overflow-y: hidden;
+  overflow-y: auto;
+  background: cornflowerblue;
+}
+
+.navbar-device .navbar-mobile-menu-wrap.active {
+  transform: translateX(0);
+}
+
+.navbar-device .navbar-nav li {
+  position: relative;
+}
+
+.navbar-device .navbar-nav li a {
+  display: block;
+  padding: 7px 15px;
+}
+
+.navbar-device .just-navbar-submenu-toggle {
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  background: lightseagreen;
+  cursor: pointer;
+}
+
+.navbar-device .navbar-nav-dropdown {
+  padding-left: 20px;
+}
+
+.navbar-device .navbar-nav-dropdown .navbar-nav-dropdown {
+  padding-left: 25px;
+}
+
+body.has-navbar-device {
+  padding-top: 40px;
+}
+
+body.menu-open {
+  height: 100%;
+  overflow: hidden;
+}

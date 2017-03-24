@@ -1,0 +1,78 @@
+// Just navbar device layout
+$just-navbar-device-height: 40px;
+
+.navbar-device {
+
+  // top panel
+  .navbar-panel {
+    @include flexbox();
+    @include justify-content(space-between);
+    @include align-items(center);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    height: $just-navbar-device-height;
+    background: blueviolet;
+  }
+
+  // menu wrap
+  .navbar-mobile-menu-wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 125%; // fix bug when scroll down in chrome, and browser panel is hide.
+    width: 255px;
+    transform: translateX(-255px);
+    overflow-y: hidden;
+    overflow-y: auto;
+    background: cornflowerblue;
+    //transition: 250ms ease-in-out;
+
+    // open state
+    &.active {
+      transform: translateX(0);
+    }
+  }
+
+  // menu styles
+  .navbar-nav li {
+    position: relative;
+
+    a {
+      display: block;
+      padding: 7px 15px;
+    }
+  }
+
+  // submenu toggle
+  .just-navbar-submenu-toggle {
+    position: absolute;
+    top: 7px;
+    right: 15px;
+    width: 15px;
+    height: 15px;
+    background: lightseagreen;
+    cursor: pointer;
+  }
+
+  //submenu styles
+  .navbar-nav-dropdown {
+    padding-left: 20px;
+
+    .navbar-nav-dropdown {
+      padding-left: 25px;
+    }
+  }
+
+}
+
+body.has-navbar-device {
+  padding-top: $just-navbar-device-height;
+}
+
+body.menu-open {
+  height: 100%;
+  overflow: hidden;
+}
