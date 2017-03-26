@@ -507,6 +507,7 @@
     var currentPos,
         startPos,
         oneWay = false,
+        secWay = false,
         isMove = false;
 
     doc.addEventListener('touchstart', function (e) {
@@ -519,18 +520,25 @@
       console.log('ctx.options.startSwipeWidth ' + ctx.options.startSwipeWidth);
       console.log('startPos ' + startPos <= ctx.options.startSwipeWidth);
 
+      isMove = true;
+      body.classList.add('menu-open');
+      doc.addEventListener('touchmove', touchmoveListener);
 
-      //if (startPos <= ctx.options.startSwipeWidth || ctx.isMenuOpen) {
-        isMove = true;
-        body.classList.add('menu-open');
-        doc.addEventListener('touchmove', touchmoveListener);
-      //}
 
     });
 
     doc.addEventListener('touchend', function (e) {
-      oneWay = false;
       doc.removeEventListener('touchmove', touchmoveListener);
+      body.classList.remove('menu-open');
+
+      // if not moved in correct way - returb
+      if(!secWay && !oneWay) {
+        return;
+      }
+
+      oneWay = false;
+      secWay = false;
+
       if (isMove) {
         isMove = false;
 
@@ -539,10 +547,12 @@
         ctx.mobileNavWrap.style.transition = '100ms cubic-bezier(.23,.59,.86,.57)';
 
         if (currentPos > ctx.mobileNavWrapWidth / 2) {
+          console.log('currentPos > ctx.mobileNavWrapWidth / 2');
           ctx.mobileNavWrap.style.transform = 'translateX(-' + 0 + 'px) translateZ(0)';
           ctx.isMenuOpen = true;
           body.classList.add('menu-open');
         } else {
+          console.log('ELSE');
           ctx.mobileNavWrap.style.transform = 'translateX(-' + ctx.mobileNavWrapWidth + 'px) translateZ(0)';
           ctx.isMenuOpen = false;
           body.classList.remove('menu-open');
@@ -558,21 +568,29 @@
 
 
     function touchmoveListener(e) {
-      var offset;
+      var offset,
+          diff;
 
       console.log('=================');
-      console.log('ctx.mobileNavWrapWidth ' + ctx.mobileNavWrapWidth);
+
       console.log('startPos ' + startPos);
 
       currentPos = e.touches[0].clientX;
+      diff = currentPos - startPos;
 
       console.log('currentPos ' + currentPos);
 
-      if (startPos < currentPos || oneWay) {
+      if(ctx.isMenuOpen || secWay) {
+        secWay = true;
+        console.log('CALCULATE BY 2 ');
+        offset = startPos - currentPos;
+      } else if ((startPos < currentPos || oneWay) && !secWay && diff > 20)  {
         oneWay = true;
+        console.log('CALCULATE BY 1 ');
         offset = ctx.mobileNavWrapWidth - (currentPos - startPos);
       } else {
-        offset = startPos - currentPos;
+        console.log('return');
+        return;
       }
 
       console.log('offset ' + offset);
@@ -589,8 +607,6 @@
 
 
       ctx.mobileNavWrap.style.transform = 'translateX(-' + offset + 'px) translateZ(0)';
-
-
     }
   }
 
