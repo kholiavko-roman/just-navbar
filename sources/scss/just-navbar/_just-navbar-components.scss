@@ -1,0 +1,91 @@
+// Just navbar components
+
+// Navbar brand
+.navbar-brand {
+	@include flexbox();
+	@include align-items(flex-end);
+}
+
+// Brand name
+.navbar-brand-name {
+	font-weight: 700;
+	font-size: 30px;
+	line-height: 23px;
+	color: $primary;
+}
+
+// Brand slogan
+.navbar-brand-slogan {
+	color: $gray;
+	font-size: 16px;
+	line-height: 16px;
+}
+
+// Navbar social wrap
+.navbar-social {
+	display: none;
+	background: bisque;
+	z-index: 99999999;
+	padding: 15px;
+
+	&.active {
+		display: block;
+	}
+}
+
+
+// Navbar toggle collapse
+$navbar-toggle-collapse: 40px;
+
+.navbar-toggle-collapse {
+	position: relative;
+	margin-right: -15px;
+
+	span {
+		top: 50%;
+		margin-top: -($navbar-toggle-collapse / 16);
+
+		&, &:before, &:after {
+			position: absolute;
+			left: 50%;
+			margin-left: -($navbar-toggle-collapse / 16);
+			width: $navbar-toggle-collapse / 8;
+			height: $navbar-toggle-collapse / 8;
+			line-height: $navbar-toggle-collapse / 8;
+			text-align: center;
+			background: $gray;
+			border-radius: 50%;
+			transition: 180ms ease-in-out;
+		}
+
+		&:before,
+		&:after {
+			content: '';
+		}
+
+		&:before {
+			bottom: 100%;
+			margin-bottom: ($navbar-toggle-collapse / 16);
+		}
+
+		&:after {
+			top: 100%;
+			margin-top: ($navbar-toggle-collapse / 16);
+		}
+	}
+
+	&.active {
+		span {
+			transform: scale(0.8);
+
+			&:before {
+				transform: translateY(($navbar-toggle-collapse / 8) * 2 + ($navbar-toggle-collapse / 16) * 2);
+			}
+
+			&:after {
+				transform: translateY(-(($navbar-toggle-collapse / 8) * 2 + ($navbar-toggle-collapse / 16) * 2));
+			}
+		}
+	}
+}
+

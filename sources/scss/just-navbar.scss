@@ -1,60 +1,144 @@
 @import "mixins/mixins";
+@import "variables";
 
 .navbar {
-  display: none;
+	display: none;
 }
 
-.navbar-device {
-  display: block;
+.navbar-device,
+.navbar-sm,
+.navbar-md,
+.navbar-lg {
+	display: block;
 }
 
-.navbar-nav-dropdown{
-  display: none;
+.navbar-nav-dropdown {
+	display: none;
 
-  .focus > &{
-    display: block;
-  }
+	.focus > & {
+		display: block;
+	}
 }
 
 .just-navbar-submenu-toggle {
-  display: inline-block;
+	display: inline-block;
 }
 
+// Toggle styles
 .navbar-toggle {
-  width: 40px;
-  height: 40px;
-  background: none;
-  border: none;
-  cursor: pointer;
+	width: 40px;
+	height: 40px;
+	background: none;
+	border: none;
+	cursor: pointer;
 
-  .icon {
-    width: 24px;
-    height: 24px;
-  }
+	.icon {
+		width: 24px;
+		height: 24px;
+		fill: $gray;
+	}
+}
+
+// Hide toggle
+.navbar-close-mobile-menu,
+.navbar-toggle-mobile-menu {
+	display: none;
 }
 
 // Sticky styles
 .just-navbar--sticky {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+	position: fixed;
+	background: #FFF;
+	top: 0;
+	right: 0;
+	left: 0;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, .15);
+	z-index: 9999999;
 }
 
-// search
-.navbar-search {
-  display: none;
-  background: bisque;
-  position: relative;
-  top: -10px;
-  z-index: 99999999;
-  padding: 15px;
+// Navbar common styles
 
-  &.active {
-    display: block;
-  }
+// Top panel
+.navbar-panel {
+	@include flexbox();
+	@include justify-content(space-between);
+	@include align-items(center);
 }
 
+.navbar-sm,
+.navbar-md,
+.navbar-lg {
+
+	// Top panel
+	.navbar-panel {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+
+	// Navbar navigation
+	.navbar-nav {
+		@include flexbox();
+		@include justify-content(space-between);
+	}
+
+	// menu styles
+	.navbar-nav li {
+		position: relative;
+
+		a {
+			display: block;
+			padding: 15px 20px;
+			color: $gray;
+		}
+
+		&:active,
+		&:focus,
+		&:hover {
+			a {
+				color: $primary;
+			}
+		}
+
+		&.navbar-has-submenu {
+			a {
+				padding-right: 25px;
+			}
+		}
+	}
+
+	// Open sumenu - rotate arrow
+	.navbar-nav li.focus {
+		> .just-navbar-submenu-toggle {
+			transform: rotate(180deg);
+		}
+	}
+
+	// submenu toggle
+	.just-navbar-submenu-toggle {
+		display: inline-block;
+		position: absolute;
+		top: 13px;
+		right: 0;
+		width: 24px;
+		height: 24px;
+		cursor: pointer;
+		background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiM3NTc1NzUiPjxwYXRoIGQ9Ik0xNi41OTQgOC41NzhsMS40MDYgMS40MDYtNiA2LTYtNiAxLjQwNi0xLjQwNiA0LjU5NCA0LjU5NHoiLz48L3N2Zz4=) no-repeat center center;
+	}
+
+	//submenu styles
+	.navbar-nav-dropdown {
+		padding-left: 20px;
+
+		.navbar-nav-dropdown {
+			padding-left: 25px;
+		}
+	}
+
+}
+
+// Include navbar components
+@import "just-navbar/just-navbar-components";
 
 // Include styles of specific navbars
 @import "just-navbar/just-navbar-device";
+@import "just-navbar/just-navbar-sm";

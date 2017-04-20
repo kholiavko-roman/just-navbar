@@ -464,3 +464,67 @@ li {
 a {
   text-decoration: none;
 }
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #fff;
+}
+
+button {
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.list-inline > li {
+  display: inline-block;
+}
+
+.icon {
+  display: inline-block;
+  transition: 180ms ease-in-out;
+}
+
+.icon-xs {
+  width: 25px;
+}
+
+.icon-default {
+  fill: #757575;
+}
+
+.icon-default:hover {
+  fill: #03A9F4;
+}
+
+.section-md {
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.section-sm {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.section-primary {
+  background-color: #03A9F4;
+}
+
+.section-primary-dark {
+  background-color: #0288D1;
+}
+
+.section-drop-shadow {
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

@@ -1,23 +1,114 @@
 @import "mixins/mixins";
 @import "normalise";
+@import "variables";
 
 * {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 a,
-button{
-  &:active,
-  &:focus {
-    outline: none;
-  }
+button {
+	&:active,
+	&:focus {
+		outline: none;
+	}
 }
 
-li{
-  list-style: none;
+li {
+	list-style: none;
 }
 
 a {
-  text-decoration: none;
+	text-decoration: none;
+}
+
+// General styles
+//
+
+body {
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 16px;
+	line-height: 1.2;
+}
+
+// Typography
+//
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+	margin-top: 0;
+	margin-bottom: 0;
+	color: #fff;
+}
+
+// Custom reset styles
+//
+
+button {
+	background: none;
+	border: none;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+// List
+//
+
+.list-inline {
+	> li {
+		display: inline-block;
+	}
+}
+
+// Icons
+//
+
+.icon {
+	display: inline-block;
+	transition: 180ms ease-in-out;
+}
+
+.icon-xs {
+	width: 25px;
+}
+
+.icon-default {
+	fill: $gray;
+
+	&:hover{
+		fill: $primary
+	}
+}
+
+// Section sizes
+//
+
+.section-md {
+	padding-top: 60px;
+	padding-bottom: 60px;
+}
+
+.section-sm {
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+// Background colors
+//
+
+.section-primary {
+	background-color: $primary;
+}
+
+.section-primary-dark {
+	background-color: $primary-dark;
+}
+
+// Shadows
+//
+
+.section-drop-shadow {
+	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
 }

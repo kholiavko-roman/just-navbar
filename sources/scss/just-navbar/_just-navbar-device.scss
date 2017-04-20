@@ -1,78 +1,128 @@
 // Just navbar device layout
-$just-navbar-device-height: 40px;
+$just-navbar-device-height: 45px;
 
 .navbar-device {
 
-  // top panel
-  .navbar-panel {
-    @include flexbox();
-    @include justify-content(space-between);
-    @include align-items(center);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 99999;
-    height: $just-navbar-device-height;
-    background: blueviolet;
-  }
+	// Show toggle
+	.navbar-close-mobile-menu,
+	.navbar-toggle-mobile-menu {
+		display: block;
+	}
 
-  // menu wrap
-  .navbar-mobile-menu-wrap {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 125%; // fix bug when scroll down in chrome, and browser panel is hide.
-    width: 255px;
-    transform: translateX(-255px);
-    overflow-y: hidden;
-    overflow-y: auto;
-    background: cornflowerblue;
-    //transition: 250ms ease-in-out;
+	// top panel
+	.navbar-panel {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 99999;
+		height: $just-navbar-device-height;
+		background-color: #fff;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, .28);
+	}
 
-    // open state
-    &.active {
-      transform: translateX(0);
-    }
-  }
+	// menu wrap
+	.navbar-mobile-menu-wrap {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		height: 100%;
+		width: 255px;
+		transform: translateX(-255px);
+		overflow-x: hidden;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		background: $primary-light;
+		box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.22);
+		will-change: transform;
+		transition: transform 330ms cubic-bezier(0, 0, 0.3, 1);
 
-  // menu styles
-  .navbar-nav li {
-    position: relative;
+		// open state
+		&.active {
+			transform: translateX(0);
+		}
 
-    a {
-      display: block;
-      padding: 7px 15px;
-    }
-  }
+		// disable transition when enabled open by swipe
+		&.no-transition {
+			transition: none;
+		}
+	}
 
-  // submenu toggle
-  .just-navbar-submenu-toggle {
-    position: absolute;
-    top: 7px;
-    right: 15px;
-    width: 15px;
-    height: 15px;
-    background: lightseagreen;
-    cursor: pointer;
-  }
+	.navbar-nav {
+		height: 100%;
+		padding-top: 44px;
+		//overflow-x: hidden;
+		//overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
 
-  //submenu styles
-  .navbar-nav-dropdown {
-    padding-left: 20px;
+	// menu styles
+	.navbar-nav li {
+		position: relative;
 
-    .navbar-nav-dropdown {
-      padding-left: 25px;
-    }
-  }
+		a {
+			display: block;
+			padding: 12px 25px;
+			font-size: 14px;
+			color: #fff;
+
+			&:active,
+			&:focus,
+			&:hover {
+				color: #fefefe;
+			}
+		}
+	}
+
+	.navbar-nav > li {
+		border-top: 1px solid rgba(255, 255, 255, .3);
+
+		&:last-child {
+			border-bottom: 1px solid rgba(255, 255, 255, .3);
+		}
+	}
+
+	// Open sumenu - rotate arrow
+	.navbar-nav li.focus {
+		> .just-navbar-submenu-toggle {
+			transform: rotate(180deg);
+		}
+	}
+
+	// submenu toggle
+	.just-navbar-submenu-toggle {
+		display: inline-block;
+		position: absolute;
+		top: 0px;
+		right: 5px;
+		width: 40px;
+		height: 40px;
+		cursor: pointer;
+		background: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNmZmYiPjxwYXRoIGQ9Ik0xNi41OTQgOC41NzhsMS40MDYgMS40MDYtNiA2LTYtNiAxLjQwNi0xLjQwNiA0LjU5NCA0LjU5NHoiPjwvcGF0aD48L3N2Zz4=) no-repeat center center;
+	}
+
+	//submenu styles
+	.navbar-nav-dropdown {
+		padding-left: 20px;
+
+		.navbar-nav-dropdown {
+			padding-left: 25px;
+		}
+	}
+
+	// Toggle collapse
+	.navbar-toggle-collapse {
+		margin-right: 0;
+	}
 
 }
 
 body.has-navbar-device {
-  padding-top: $just-navbar-device-height;
+	padding-top: $just-navbar-device-height;
 }
 
 body.menu-open {
-  height: 100%;
-  overflow: hidden;
+	height: 100%;
+	overflow: hidden;
 }
