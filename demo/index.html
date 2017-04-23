@@ -43,12 +43,14 @@
 
 <header class="navbar-wrap">
   <div class="navbar" data-md-device-layout="navbar-device" data-md-stick-up-offset="50px"
-       data-lg-stick-up-offset="15px" data-xs-menu-swipe="true" data-sm-menu-swipe="true">
+       data-lg-stick-up-offset="15px" data-xs-menu-swipe="true" data-sm-menu-swipe="true" data-anchor="true">
 
     <!--Navbar panel-->
     <div class="navbar-panel">
       <button class="navbar-toggle navbar-toggle-mobile-menu" data-swipe-toggle>
-        <svg class="icon"><use xlink:href="#icon-menu"></use></svg>
+        <svg class="icon">
+          <use xlink:href="#icon-menu"></use>
+        </svg>
       </button>
 
       <!--Navbar logo-->
@@ -60,27 +62,28 @@
       <!--Navbar-nav wrap-->
       <div class="navbar-mobile-menu-wrap">
         <button class="navbar-close-mobile-menu">
-          <svg class="icon" width="24" height="24"><use xlink:href="#icon-close"></use></svg>
+          <svg class="icon" width="24" height="24">
+            <use xlink:href="#icon-close"></use>
+          </svg>
         </button>
 
         <!--Navbar navigation-->
         <div class="navbar-nav-wrap">
           <ul class="navbar-nav" data-nav>
             <li>
-              <a href="#">Home</a>
-            </li>
+              <a href="#home">Home</a>
             </li>
             <li>
-              <a href="#">
-                About
+              <a href="#features">
+                Features
               </a>
               <ul class="navbar-nav-dropdown" data-nav-submenu>
                 <li>
-                  <a href="#">About 1</a>
+                  <a href="#">Features 1</a>
                 </li>
                 <li>
                   <a href="#">
-                    About 2
+                    Features 2
                   </a>
                   <ul class="navbar-nav-dropdown" data-nav-submenu>
                     <li>
@@ -101,21 +104,53 @@
                   </ul>
                 </li>
                 <li>
-                  <a href="#">About 3</a>
+                  <a href="#">Features 3</a>
+                  <ul class="navbar-nav-dropdown" data-nav-submenu>
+                    <li>
+                      <a href="#">
+                        Link 1
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Link 2
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Link 3
+                      </a>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </li>
             <li>
-              <a href="#">Who we are ?</a>
+              <a href="#features">
+                Test
+              </a>
+              <ul class="navbar-nav-dropdown" data-nav-submenu>
+                <li>
+                  <a href="#">Features 1</a>
+                </li>
+                <li>
+                  <a href="#">
+                    Features 2
+                  </a>
+                </li>
+                <li>
+                  <a href="#">Features 3</a>
+                </li>
+              </ul>
             </li>
             <li>
-              <a href="#">Contact us</a>
+              <a href="#about">About</a>
             </li>
           </ul>
         </div>
       </div>
 
-      <button  class="navbar-toggle navbar-toggle-collapse" data-target=".navbar-social">
+      <button class="navbar-toggle navbar-toggle-collapse" data-target=".navbar-social">
         <span></span>
       </button>
     </div>
@@ -123,29 +158,29 @@
 
     <div class="navbar-social">
       <div class="navbar-social-inner">
-          <ul class="list list-inline">
-            <li>
-              <a href="#">
-                <svg class="icon icon-xs icon-default" height="25">
-                  <use xlink:href="#icon-twitter-square"></use>
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <svg class="icon icon-xs icon-default" height="25">
-                  <use xlink:href="#icon-github-square"></use>
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <svg class="icon icon-xs icon-default" height="25">
-                  <use xlink:href="#icon-google-plus-square"></use>
-                </svg>
-              </a>
-            </li>
-          </ul>
+        <ul class="list list-inline">
+          <li>
+            <a href="#">
+              <svg class="icon icon-xs icon-default" height="25">
+                <use xlink:href="#icon-twitter-square"></use>
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg class="icon icon-xs icon-default" height="25">
+                <use xlink:href="#icon-github-square"></use>
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg class="icon icon-xs icon-default" height="25">
+                <use xlink:href="#icon-google-plus-square"></use>
+              </svg>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -153,22 +188,62 @@
 </header>
 
 <main>
-	<section class="section-md section-drop-shadow section-primary">
-		<div class="container">
-			<h1>Just Navbar</h1>
-			<h4>The most powerful navigation for you site</h4>
-		</div>
-	</section>
+  <section id="home" data-anchor-item>
+    <section class="section-md section-drop-shadow section-primary">
+      <div class="container">
+        <h1>Just Navbar</h1>
+        <h4>The most powerful navigation for you site</h4>
+      </div>
+    </section>
 
-	<section style="background: url('https://images.unsplash.com/photo-1489617482379-fc98cdb77efb?dpr=1&auto=format&fit=crop&w=1500&h=844&q=80&cs=tinysrgb&crop=&bg=') no-repeat center center;padding: 120px 0;background-attachment: fixed;background-size: cover;">
+    <section style="background: url('https://images.unsplash.com/photo-1489617482379-fc98cdb77efb?dpr=1&auto=format&fit=crop&w=1500&h=844&q=80&cs=tinysrgb&crop=&bg=') no-repeat center center;padding: 120px 0;background-attachment: fixed;background-size: cover;">
+      <div>
+        <h5>Inside this section you cant swipe mobile menu</h5>
+        <div>
+          <h5>Inside this section you cant swipe mobile menu</h5>
+          <div>
+            <h5>Inside this section you cant swipe mobile menu</h5>
+            <div>
+              <h5>Inside this section you cant swipe mobile menu</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
 
-	</section>
+
+  <section id="features" data-anchor-item class="section-md">
+    <div style="height: 80vh; background: url(https://images.unsplash.com/photo-1446755080022-0a8c97e60377?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=&bg=) no-repeat center center; background-size: cover">
+
+      <div>
+        <h5>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum dignissimos iste laborum modi molestiae! Accusamus autem debitis exercitationem expedita illo illum magni maiores perferendis quae quasi, qui quod recusandae ullam!</h5>
+        <div>
+          <h5>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis cupiditate, deleniti dicta distinctio ducimus eligendi eos est excepturi facilis id magni minus molestias, neque quasi reiciendis, sit ut veritatis vitae.</h5>
+          <div>
+            <h5>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus laboriosam omnis optio quibusdam? Alias aliquam architecto commodi delectus harum ipsam laudantium minus molestias mollitia praesentium quo, reiciendis reprehenderit sit ut?</h5>
+            <div>
+              <h5>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aperiam autem consequatur cumque dicta dolor dolorum, ea eius enim exercitationem nam nemo quaerat ratione, reiciendis ut, vel vero vitae voluptates!</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
 
   <section class="section-sm section-primary-dark" data-nav-swipe-ignore>
     <div>
       <h5>Inside this section you cant swipe mobile menu</h5>
     </div>
   </section>
+
+
+  <section id="about" data-anchor-item class="section-md">
+    <div style="height: 70vh; background: url(https://images.unsplash.com/photo-1485609315582-cfffa02888e8?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=&bg=) no-repeat center center; background-size: cover"></div>
+  </section>
+
 
 </main>
 

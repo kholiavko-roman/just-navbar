@@ -42,6 +42,34 @@
 					}
 				}
 			},
+			/**
+			 * Siblings
+			 * @desc get all siblings of element
+			 * @return [Array] of siblings elements
+			 **/
+			siblings = function (node) {
+				// convert NodeList to array
+				return [].slice.call(node.parentNode.children)
+						// filter current element
+						.filter(function (elem) {
+							return elem !== node
+						});
+			},
+			/**
+			 * Extend
+			 * @desc extend all methods and prop form source object to target
+			 **/
+			extend = function (target, source) {
+				for (var prop in source) {
+					if (typeof source[prop] === 'object') {
+						target[prop] = extend(target[prop], source[prop]);
+					} else {
+						target[prop] = source[prop];
+					}
+				}
+
+				return target;
+			},
 			checkForIgnores = function (el) {
 				while (el.parentNode) {
 					if (el.dataset.navSwipeIgnore !== undefined) {
@@ -58,7 +86,7 @@
 	 * @class JustNavbar.
 	 * @public
 	 * @param {HTMLElement} element - Css selector of element.
-	 * @param {Object} [options] - The options
+	 * @param {Object} options - The options
 	 * */
 	var JustNavbar = function (el, options) {
 		var ctx = this;
@@ -77,7 +105,7 @@
 		ctx.isMenuOpen = false;
 		ctx.isMeuOpening = false;
 		ctx.swipeMenuOrientation = ctx.options.swipeMenuDirection === 'left' ? -1 : 1;
-		console.log('isStuck ' + ctx.isStuck);
+		ctx.currentAnchorItem = null;
 
 		ctx.closeMobileNav = ctx.closeMobileNav.bind(ctx);
 
@@ -91,6 +119,8 @@
 	JustNavbar.prototype._Defaults = {
 		navClass: 'navbar-nav',
 		stickUp: true,
+		anchorNav: false,
+		focusOnHoverTimeout: 700,
 		startSwipeWidth: 10,
 		swipeMenuDirection: 'left',
 		swipeTransition: '100ms cubic-bezier(.23,.59,.86,.57)',
@@ -154,6 +184,11 @@
 		// Set active layout
 		// get current layout and pass it to switchNav layout
 		ctx._switchNavLayout(ctx, ctx._getLayout(ctx, currentRespWidth['alias']));
+
+		// Set active anchor nav if
+		if (ctx.options.anchorNav) {
+			ctx._activateAnchorNav(ctx);
+		}
 	}
 
 	/**
@@ -219,6 +254,8 @@
 				}
 			}
 		}
+
+		ctx.options.anchorNav = ctx.element.getAttribute('data-anchor') || false;
 	}
 
 	/**
@@ -250,16 +287,12 @@
 	 * @protected
 	 **/
 	JustNavbar.prototype._applyHandlers = function (ctx) {
-		var navWithSubmenu = doc.querySelector('.navbar-has-submenu > a'),
-				currentEl = null;
-
-		console.log(navWithSubmenu);
+		var navWithSubmenu = doc.querySelectorAll('.navbar-has-submenu'),
+				timer,
+				i;
 
 		doc.addEventListener('click', function (e) {
 			var target = e.target;
-
-			console.log('ctx.currentToggle ');
-			console.log(ctx.currentToggle);
 
 			// Toggles for opening sub-menu
 			// Bind this event via document, because target element was created dynamically
@@ -292,44 +325,40 @@
 			}
 		});
 
+		// Add events to nav with submenu
+		for (i = 0; i < navWithSubmenu.length; i++) {
+			var item = navWithSubmenu[i];
 
-		// Add class for open sub-menu
-		navWithSubmenu.onmouseover = function (e) {
-			var target = e.target,
-					parentNode = target.parentNode;
+			// Add class for open sub-menu
+			item.onmouseenter = function (e) {
+				var target = e.target,
+						siblElements = siblings(target);
 
-			// Add focus class to open submenu
-			if (ctx._getOption(ctx, 'focusOnHover') && target && !currentEl) {
-				console.log('aaa');
-				parentNode.classList.add('focus');
-				currentEl = parentNode;
-			}
-		};
+				// Add focus class to open submenu
+				if (ctx._getOption(ctx, 'focusOnHover') && target) {
 
-		// Remove class focus
-		navWithSubmenu.onmouseout = function (e) {
-			var relatedTarget;
+					// close all siblings submenu
+					operateWithClass(siblElements, 'delete', 'focus');
 
-			if (!currentEl) return;
+					// clear timer
+					clearTimeout(timer);
 
-			relatedTarget = event.relatedTarget;
-
-			if (relatedTarget) {
-				while (relatedTarget) {
-
-					// If inside current element, do not remove focus class
-					if (relatedTarget == currentEl) {
-						console.log('return');
-						//TODO fix close submenu on mouseout.
-						return;
-					}
-					relatedTarget = relatedTarget.parentNode;
+					//add focus to current el
+					target.classList.add('focus');
 				}
-			}
+			};
 
-			currentEl.classList.remove('focus');
-			currentEl = null;
-		};
+			// Remove class focus
+			item.onmouseleave = function onMouseOut(e) {
+				var _this = this;
+
+				timer = setTimeout(function () {
+					_this.classList.remove('focus');
+				}, ctx.options.focusOnHoverTimeout);
+			};
+
+		}
+
 
 		// Add orientationchange and on resize events
 		window.addEventListener("orientationchange", function () {
@@ -341,14 +370,20 @@
 		});
 
 		// Close mobile menu
-		if(ctx.hideBtnEl) {
+		if (ctx.hideBtnEl) {
 			ctx.hideBtnEl.addEventListener('click', ctx.closeMobileNav);
 		}
 
 		// Add onscroll event to set sticky navbar
 		window.addEventListener("scroll", function () {
+			// Enable stick up
 			if (ctx._getOption(ctx, 'stickUp')) {
 				ctx._stickUp(ctx);
+			}
+
+			// Anchor nav
+			if (ctx.options.anchorNav) {
+				ctx._activateAnchorNav(ctx);
 			}
 		});
 
@@ -408,7 +443,6 @@
 	 * @protected
 	 **/
 	JustNavbar.prototype._switchNavLayout = function (ctx, targetLayout) {
-		console.log('_switchNavLayout');
 
 		// Close opened submenu and toggle
 		operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
@@ -446,6 +480,7 @@
 
 			// Close opened submenu and toggle
 			operateWithClass(ctx.element.querySelectorAll('.navbar-has-submenu'), 'remove', 'focus');
+
 			ctx._closeToggles(ctx);
 			console.log(getScrollOffsetVal());
 			console.log('add sticky');
@@ -513,7 +548,6 @@
 					operateWithClass(el, 'toggle', 'active');
 				}
 			})(target));
-
 
 
 			// Button for opening mobile swipe menu
@@ -785,24 +819,53 @@
 
 
 	/**
-	 * Helpers methods
+	 * EnableAnchor
+	 * @desc Enable anchor navigation
+	 * @protected
 	 **/
+	JustNavbar.prototype._activateAnchorNav = function (ctx) {
+		var links = ctx.mobileNavWrap.querySelectorAll('.' + ctx.options.navClass + ' > li > a[href^="#"'),
+		// scrollTop = win.pageYOffset,
+				centerX = doc.documentElement.clientWidth / 2,
+				centerY = doc.documentElement.clientHeight / 2,
+				elem = document.elementFromPoint(centerX, centerY),
+				currentHref,
+				i;
 
-	/**
-	 * Extend
-	 * @desc extend all methods and prop form source object to target
-	 **/
-	function extend(target, source) {
-		for (var prop in source) {
-			if (typeof source[prop] === 'object') {
-				console.log(source[prop]);
-				target[prop] = extend(target[prop], source[prop]);
-			} else {
-				target[prop] = source[prop];
+		//TODO: refactor code when use while loop to parent node
+		// check parents node of element in the center of screen
+		if (!elem.dataset.anchorItem) {
+			while (elem.parentNode && elem.tagName.toLocaleLowerCase() != 'html') {
+				if (elem.dataset.anchorItem !== undefined) {
+					break;
+				}
+				elem = elem.parentNode;
 			}
 		}
 
-		return target;
+		currentHref = '#' + elem.getAttribute('id')
+
+		if (currentHref) {
+			for (i = 0; i < links.length; i++) {
+				var item = links[i],
+						parentItem = item.parentNode,
+						anchor = item.getAttribute('href');
+
+				if (anchor === currentHref && !parentItem.classList.contains('active')) {
+
+					// Remove current active class
+					if (ctx.currentAnchorItem) {
+						ctx.currentAnchorItem.classList.remove('active');
+					}
+
+					// Set new current item
+					ctx.currentAnchorItem = parentItem;
+					parentItem.classList.add('active');
+				}
+			}
+		}
+
+
 	}
 
 

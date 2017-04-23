@@ -116,6 +116,15 @@ $just-navbar-device-height: 45px;
 		margin-right: 0;
 	}
 
+	// submenu
+	.navbar-nav-dropdown {
+		display: none;
+
+		.focus > & {
+			display: block;
+		}
+	}
+
 }
 
 body.has-navbar-device {
