@@ -628,28 +628,35 @@
 
 			// If swipe enabled on this screen resolution
 			if (ctx._getOption(ctx, 'swipeDeviceMenu')) {
-				if (!ctx.mobileNavWrapWidth) {
-					ctx.mobileNavWrapWidth = ctx.mobileNavWrap.offsetWidth;
-				}
 
 				// If clicked inside ignored element and menu is not in opening state
 				if (!ctx.isMenuOpen && checkForIgnores(e.target)) {
 					return;
 				}
 
+				if (!ctx.mobileNavWrapWidth) {
+					ctx.mobileNavWrapWidth = ctx.mobileNavWrap.offsetWidth;
+				}
+
+				
 				startPos = e.touches[0].clientX;
 				console.log('startPos ' + startPos);
 				console.log('ctx.options.startSwipeWidth ' + ctx.options.startSwipeWidth);
 				console.log('startPos ' + startPos <= ctx.options.startSwipeWidth);
 
-				ctx.mobileNavWrap.classList.add('no-transition');
-
-				doc.addEventListener('touchmove', touchmoveListener);
+				requestAnimationFrame(update);
 			}
 		});
 
+		doc.addEventListener('touchmove', function (e) {
+			isMove = true;
+			console.log('=================');
+
+			currentPos = e.touches[0].clientX;
+		});
+
+
 		doc.addEventListener('touchend', function (e) {
-			doc.removeEventListener('touchmove', touchmoveListener);
 
 			// if not moved in correct way - return
 			if (!secWay && !oneWay) {
@@ -673,18 +680,14 @@
 		});
 
 
-		function touchmoveListener(e) {
+		function update() {
 			var offset;
 
-			isMove = true;
+			console.log('update');
+			if(!isMove) return;
 
-			console.log('=================');
-
-			currentPos = e.touches[0].clientX;
 			diff = Math.abs(currentPos - startPos);
 			offset = currentPos - startPos;
-
-			ctx.mobileNavWrap.classList.remove('no-transition');
 
 			// Menu in left direction
 			if (ctx.options.swipeMenuDirection === 'left') {
@@ -726,13 +729,13 @@
 				offset = offset < 0 ? 0 : offset;
 			}
 
-			console.log('offset ' + offset);
-
 			// if menu closed
 			offset = Math.abs(offset) > ctx.mobileNavWrapWidth ? ctx.mobileNavWrapWidth * ctx.swipeMenuOrientation : offset;
-			console.log('  ==offset ' + offset);
+
 
 			ctx._addTranslate(ctx, offset);
+
+			requestAnimationFrame(update);
 		}
 
 	}
